@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "cmath": "cpp"
+  },
+  "terminal.integrated.scrollback": 100000000
+}
