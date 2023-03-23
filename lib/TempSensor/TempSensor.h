@@ -30,14 +30,11 @@ class TempSensor {
     double resistorVoltage;
     double unknownResistance;
 
-    Smoothed<double> *ResistanceFilter;
-
   public:
     TempSensor(int type, int pin, int inputVoltage, int weight = 20);
 
     void update();
 
-    double getRawResistance();
     double getResistance();
     double getTemperature();
 };

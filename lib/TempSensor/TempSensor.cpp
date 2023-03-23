@@ -8,9 +8,6 @@
 
 TempSensor::TempSensor(int type, int pin, int inputVoltage, int weight) 
 {
-  ResistanceFilter = new Smoothed<double>();
-  ResistanceFilter->begin(SMOOTHED_EXPONENTIAL, weight);
-
   this->type = type;
   this->pin = pin;
   this->inputVoltage = inputVoltage;
@@ -24,18 +21,11 @@ void TempSensor::update()
 {
   resistorVoltage = analogRead(pin) * inputVoltage / 4096;
   unknownResistance = knownResistance * ((inputVoltage/resistorVoltage) - 1);
-  
-  ResistanceFilter->add(unknownResistance);
-}
-
-double TempSensor::getRawResistance()
-{
-  return unknownResistance;
 }
 
 double TempSensor::getResistance()
 {
-  return ResistanceFilter->get();
+  return unknownResistance;
 }
 
 double TempSensor::getTemperature()
@@ -43,17 +33,18 @@ double TempSensor::getTemperature()
   double currentResistance = unknownResistance;
   double logR = log(currentResistance);
 
-  if (type == THERMISTOR_100K) {
-    return -22.58*log(currentResistance) + 285.15;
-  } else if (type == THERMISTOR_1K) {
-    double f = 1 / (C1_1K + C2_1K * logR + C3_1K * pow(logR, 3));
-    return f - 273.15;
-  } else if (type == RESISTOR_100K) {
-    return 0;
-  } else if (type == RESISTOR_1M) {
-    return -36.67 * logR + 496.82;
-  } else { 
-    return 0;
+  if (type == THERMISTOR_100K) 
+  {
+    return -22.58 * log(currentResistance) + 285.15;
+  } 
+  else if (type == THERMISTOR_1K) 
+  {
+    return 1 / (C1_1K + C2_1K * logR + C3_1K * pow(logR, 3)) - 273.15;
   }
+  else if (type == RESISTOR_1M) 
+  {
+    return -9e-5 * currentResistance + 65.018;
+  }
+  return 0;
 }
 
